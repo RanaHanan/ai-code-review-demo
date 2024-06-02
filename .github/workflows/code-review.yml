@@ -1,0 +1,48 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install ESLint
+        run: npm install eslint
+
+      - name: Run ESLint
+        run: npx eslint app.js || true  # Allow ESLint to fail
+
+      - name: AI Code Review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          FILE_CONTENT=$(cat app.js)
+          AI_RESPONSE=$(curl -s -X POST https://api.openai.com/v1/completions \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "text-davinci-003",
+              "prompt": "Review the following JavaScript code for best practices, security vulnerabilities, and performance improvements:\n\n"'"$FILE_CONTENT"'\n\nProvide detailed feedback and corrections:",
+              "max_tokens": 300
+            }')
+          echo "AI response: $AI_RESPONSE"
+          echo "$AI_RESPONSE" > ai_review.txt
+
+      - name: Post AI Review Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ### AI Code Review
+            $(cat ai_review.txt)
