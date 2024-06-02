@@ -1,10 +1,8 @@
-// app.js
-function greet(1name) {
-    if (name) {
-        console.log("Hello, " + name + "!");
-    } else {
-        console.log("Hello,  you see World!");
-    }
-}
-
-greet();
+function greet(name) {
+    return "Hello, " + name; // Missing space before and after '+'
+  }
+  
+  const result = greet("John"); // Unused variable 'result'
+  
+  console.log(result);
+  
