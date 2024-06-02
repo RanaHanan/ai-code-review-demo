@@ -1,9 +1,9 @@
 // app.js
-function greet(name) {
+function greet(1name) {
     if (name) {
         console.log("Hello, " + name + "!");
     } else {
-        console.log("Hello, World!");
+        console.log("Hello,  you see World!");
     }
 }
 
